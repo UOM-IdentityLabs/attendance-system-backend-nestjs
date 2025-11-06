@@ -13,7 +13,7 @@ import { CreateUniversitiesDto } from './dto/create-universities.dto';
 import { GetUniversitiesDto } from './dto/get-universities.dto';
 import { UpdateUniversitiesDto } from './dto/update-universities.dto';
 
-@Controller('universities')
+@Controller('university')
 export class UniversitiesController {
   constructor(private readonly universityService: UniversitiesService) {}
 

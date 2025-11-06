@@ -6,12 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfigAsync } from './common/config/typeorm.config';
 import { UniversitiesModule } from './universities/universities.module';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
+import { CollegesModule } from './colleges/colleges.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     UniversitiesModule,
+    CollegesModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],

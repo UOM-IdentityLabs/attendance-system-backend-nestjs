@@ -1,5 +1,6 @@
+import { Colleges } from 'src/colleges/entities/colleges.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity()
 export class Universities extends CoreEntity {
@@ -10,4 +11,7 @@ export class Universities extends CoreEntity {
     nullable: false,
   })
   universityName: string;
+
+  @OneToMany(() => Colleges, (college) => college.university)
+  colleges: Colleges[];
 }
