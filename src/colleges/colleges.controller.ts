@@ -13,7 +13,7 @@ import { CreateCollegesDto } from './dto/create-colleges.dto';
 import { GetCollegesDto } from './dto/get-colleges.dto';
 import { UpdateCollegesDto } from './dto/update-colleges.dto';
 
-@Controller('college')
+@Controller('colleges')
 export class CollegesController {
   constructor(private readonly collegeService: CollegesService) {}
 
