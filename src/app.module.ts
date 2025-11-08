@@ -7,6 +7,7 @@ import { typeOrmConfigAsync } from './common/config/typeorm.config';
 import { UniversitiesModule } from './universities/universities.module';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 import { CollegesModule } from './colleges/colleges.module';
+import { DepartmentsModule } from './departments/departments.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CollegesModule } from './colleges/colleges.module';
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     UniversitiesModule,
     CollegesModule,
+    DepartmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
