@@ -8,6 +8,7 @@ import { UniversitiesModule } from './universities/universities.module';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 import { CollegesModule } from './colleges/colleges.module';
 import { DepartmentsModule } from './departments/departments.module';
+import { PersonsModule } from './persons/persons.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { DepartmentsModule } from './departments/departments.module';
     UniversitiesModule,
     CollegesModule,
     DepartmentsModule,
+    PersonsModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
