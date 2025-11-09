@@ -10,6 +10,7 @@ import { CollegesModule } from './colleges/colleges.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { PersonsModule } from './persons/persons.module';
 import { CollegeYearsModule } from './college_years/college-years.module';
+import { CoursesModule } from './courses/courses.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CollegeYearsModule } from './college_years/college-years.module';
     DepartmentsModule,
     PersonsModule,
     CollegeYearsModule,
+    CoursesModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
