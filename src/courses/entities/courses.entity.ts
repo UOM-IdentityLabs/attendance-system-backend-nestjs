@@ -1,7 +1,8 @@
 import { Departments } from 'src/departments/entities/departments.entity';
 import { CollegeYears } from 'src/college_years/entities/college-years.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { TeacherCourses } from 'src/teacher_courses/entities/teacher-courses.entity';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity()
 export class Courses extends CoreEntity {
@@ -26,4 +27,7 @@ export class Courses extends CoreEntity {
   @ManyToOne(() => CollegeYears, (collegeYear) => collegeYear.courses)
   @JoinColumn({ name: 'collegeYear_id' })
   collegeYear: CollegeYears;
+
+  @OneToMany(() => TeacherCourses, (teacherCourse) => teacherCourse.course)
+  teacherCourses: TeacherCourses[];
 }
