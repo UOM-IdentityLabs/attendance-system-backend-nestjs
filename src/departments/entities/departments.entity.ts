@@ -2,6 +2,7 @@ import { Colleges } from 'src/colleges/entities/colleges.entity';
 import { Courses } from 'src/courses/entities/courses.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { DepartmentHead } from 'src/department_head/entities/department-head.entity';
+import { Teachers } from 'src/teachers/entities/teachers.entity';
 import {
   Column,
   Entity,
@@ -33,4 +34,7 @@ export class Departments extends CoreEntity {
     (departmentHead) => departmentHead.department,
   )
   departmentHeads: DepartmentHead[];
+
+  @OneToMany(() => Teachers, (teacher) => teacher.department)
+  teachers: Teachers[];
 }
