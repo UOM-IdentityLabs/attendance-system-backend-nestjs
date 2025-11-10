@@ -17,6 +17,7 @@ import { DepartmentHeadModule } from './department_head/department-head.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { StudentsModule } from './students/students.module';
 import { TeacherCoursesModule } from './teacher_courses/teacher-courses.module';
+import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { TeacherCoursesModule } from './teacher_courses/teacher-courses.module';
     TeachersModule,
     StudentsModule,
     TeacherCoursesModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],

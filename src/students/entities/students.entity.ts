@@ -1,10 +1,11 @@
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { Attendance } from 'src/attendance/entities/attendance.entity';
 import { CollegeYears } from 'src/college_years/entities/college-years.entity';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Groups } from 'src/groups/entities/groups.entity';
 import { Persons } from 'src/persons/entities/persons.entity';
 import { Users } from 'src/users/entities/users.entity';
-import { Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
 @Entity()
 export class Students extends CoreEntity {
@@ -27,4 +28,7 @@ export class Students extends CoreEntity {
   @ManyToOne(() => CollegeYears, (collegeYear) => collegeYear.students)
   @JoinColumn({ name: 'college_year_id' })
   collegeYear: CollegeYears;
+
+  @OneToMany(() => Attendance, (attendance) => attendance.student)
+  attendances: Attendance[];
 }
