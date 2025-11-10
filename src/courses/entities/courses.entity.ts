@@ -20,10 +20,10 @@ export class Courses extends CoreEntity {
   semester: string;
 
   @ManyToOne(() => Departments, (department) => department.courses)
-  @JoinColumn({ name: 'departmentId' })
+  @JoinColumn({ name: 'department_id' })
   department: Departments;
 
   @ManyToOne(() => CollegeYears, (collegeYear) => collegeYear.courses)
-  @JoinColumn({ name: 'collegeYearId' })
+  @JoinColumn({ name: 'collegeYear_id' })
   collegeYear: CollegeYears;
 }

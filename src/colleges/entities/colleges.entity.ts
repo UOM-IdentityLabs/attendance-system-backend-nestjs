@@ -17,6 +17,6 @@ export class Colleges extends CoreEntity {
   departments: Departments[];
 
   @ManyToOne(() => Universities, (university) => university.colleges)
-  @JoinColumn({ name: 'universityId' })
+  @JoinColumn({ name: 'university_id' })
   university: Universities;
 }
