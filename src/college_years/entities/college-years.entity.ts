@@ -1,5 +1,6 @@
 import { Courses } from 'src/courses/entities/courses.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { Students } from 'src/students/entities/students.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity()
@@ -14,4 +15,7 @@ export class CollegeYears extends CoreEntity {
 
   @OneToMany(() => Courses, (course) => course.collegeYear)
   courses: Courses[];
+
+  @OneToMany(() => Students, (student) => student.collegeYear)
+  students: Students[];
 }

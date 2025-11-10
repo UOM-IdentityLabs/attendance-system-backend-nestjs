@@ -1,5 +1,6 @@
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { DepartmentHead } from 'src/department_head/entities/department-head.entity';
+import { Students } from 'src/students/entities/students.entity';
 import { Teachers } from 'src/teachers/entities/teachers.entity';
 import { Column, Entity, OneToOne } from 'typeorm';
 
@@ -22,4 +23,7 @@ export class Users extends CoreEntity {
 
   @OneToOne(() => Teachers, (teacher) => teacher.user)
   teacher: Teachers;
+
+  @OneToOne(() => Students, (student) => student.user)
+  student: Students;
 }

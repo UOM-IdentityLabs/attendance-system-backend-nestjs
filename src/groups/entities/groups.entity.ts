@@ -1,5 +1,6 @@
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity } from 'typeorm';
+import { Students } from 'src/students/entities/students.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity()
 export class Groups extends CoreEntity {
@@ -10,4 +11,7 @@ export class Groups extends CoreEntity {
     nullable: false,
   })
   groupName: string;
+
+  @OneToMany(() => Students, (student) => student.group)
+  students: Students[];
 }
