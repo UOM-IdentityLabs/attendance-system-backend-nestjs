@@ -12,6 +12,7 @@ import { PersonsModule } from './persons/persons.module';
 import { CollegeYearsModule } from './college_years/college-years.module';
 import { CoursesModule } from './courses/courses.module';
 import { GroupsModule } from './groups/groups.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { GroupsModule } from './groups/groups.module';
     CollegeYearsModule,
     CoursesModule,
     GroupsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
