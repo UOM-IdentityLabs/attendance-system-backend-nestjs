@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePersonsDto {
   @IsString()
@@ -22,18 +22,22 @@ export class CreatePersonsDto {
   @Type(() => String)
   fourthName: string;
 
+  @IsOptional()
   @IsString()
   @Type(() => String)
   image?: string;
 
+  @IsOptional()
   @IsString()
   @Type(() => String)
   email?: string;
 
+  @IsOptional()
   @IsString()
   @Type(() => String)
   phone?: string;
 
+  @IsNotEmpty()
   @IsDate()
   @Type(() => Date)
   birthDate: Date;
