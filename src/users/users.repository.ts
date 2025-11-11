@@ -11,6 +11,7 @@ import { UpdateUsersDto } from './dto/update-users.dto';
 import { Users } from './entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
+import { Bcrypt } from 'src/common/classes/bcrypt.class';
 
 @Injectable()
 export class UsersRepository
@@ -18,6 +19,7 @@ export class UsersRepository
 {
   constructor(
     @InjectRepository(Users) private readonly user: Repository<Users>,
+    private readonly bcrypt: Bcrypt,
   ) {}
 
   async create(createDto: CreateUsersDto): Promise<Users> {
@@ -26,7 +28,7 @@ export class UsersRepository
     const newUser = new Users();
 
     newUser.username = username;
-    newUser.password = password;
+    newUser.password = await this.bcrypt.hashUserPassword(password);
     newUser.role = role;
     newUser.email = email;
 
