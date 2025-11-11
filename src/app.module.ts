@@ -18,10 +18,11 @@ import { TeachersModule } from './teachers/teachers.module';
 import { StudentsModule } from './students/students.module';
 import { TeacherCoursesModule } from './teacher_courses/teacher-courses.module';
 import { AttendanceModule } from './attendance/attendance.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     UniversitiesModule,
     CollegesModule,
@@ -36,6 +37,7 @@ import { AttendanceModule } from './attendance/attendance.module';
     StudentsModule,
     TeacherCoursesModule,
     AttendanceModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
