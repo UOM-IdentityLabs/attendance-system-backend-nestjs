@@ -1,6 +1,6 @@
 export enum UserRoleEnum {
   SUPER = 'super',
-  ADMIN = 'admin',
+  DEPARTMENT_HEAD = 'departmentHead',
   TEACHER = 'teacher',
   STUDENT = 'student',
 }

@@ -31,17 +31,37 @@ export class AuthService {
     if (
       !(await this.bcrypt.isValidPassword(loginDto.password, user.password))
     ) {
-      //throw new UnauthorizedException('username or password is incorrect');
+      throw new UnauthorizedException('username or password is incorrect');
     }
 
-    const { id, username, role, email } = user;
+    const { id, username, role, email, student, teacher, departmentHead } =
+      user;
 
-    const token = await this.jwtService.signAsync({
-      id,
+    const payload: any = {
+      sub: id,
       username,
       role,
       email,
-    });
+    };
+
+    if (role === 'student') {
+      payload.studentId = student?.id;
+      payload.departmentId = student?.department?.id;
+      payload.groupId = student?.group?.id;
+      payload.collegeYearId = student?.collegeYear?.id;
+    }
+
+    if (role === 'teacher') {
+      payload.teacherId = teacher?.id;
+      payload.departmentId = teacher?.department?.id;
+    }
+
+    if (role === 'department_head') {
+      payload.departmentHeadId = departmentHead?.id;
+      payload.departmentId = departmentHead?.department?.id;
+    }
+
+    const token = await this.jwtService.signAsync(payload);
 
     delete user.password;
 

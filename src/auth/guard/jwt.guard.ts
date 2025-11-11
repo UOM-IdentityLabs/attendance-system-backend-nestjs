@@ -24,11 +24,17 @@ export class JwtGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
 
-      request.users = {
-        userId: payload.id,
+      request.user = {
+        userId: payload.sub,
         username: payload.username,
         role: payload.role,
         email: payload.email,
+        studentId: payload.studentId,
+        teacherId: payload.teacherId,
+        departmentHeadId: payload.departmentHeadId,
+        departmentId: payload.departmentId,
+        groupId: payload.groupId,
+        collgeYearId: payload.collegeYearId,
         iat: payload.iat,
         exp: payload.exp,
       };
