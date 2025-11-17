@@ -23,11 +23,10 @@ export class UsersRepository
   ) {}
 
   async create(createDto: CreateUsersDto): Promise<Users> {
-    const { username, password, role, email } = createDto;
+    const { password, role, email } = createDto;
 
     const newUser = new Users();
 
-    newUser.username = username;
     newUser.password = await this.bcrypt.hashUserPassword(password);
     newUser.role = role;
     newUser.email = email;
@@ -36,9 +35,7 @@ export class UsersRepository
       return await this.user.save(newUser);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException(
-          'User with this username or email already exists',
-        );
+        throw new ConflictException('User with this email already exists');
       }
       throw new InternalServerErrorException(error.message);
     }
@@ -50,10 +47,7 @@ export class UsersRepository
     const [users, total] = await this.user.findAndCount({
       take: limit ?? 100,
       skip: offset ?? 0,
-      where: [
-        { username: search ? ILike(`%${search}%`) : undefined },
-        { email: search ? ILike(`%${search}%`) : undefined },
-      ],
+      where: [{ email: search ? ILike(`%${search}%`) : undefined }],
     });
 
     return { users, total };
@@ -70,9 +64,8 @@ export class UsersRepository
   async update(id: string, updateDto: UpdateUsersDto): Promise<Users> {
     const foundUser = await this.getById(id, {});
 
-    const { username, password, role, email } = updateDto;
+    const { password, role, email } = updateDto;
 
-    foundUser.username = username ?? foundUser.username;
     foundUser.password = password ?? foundUser.password;
     foundUser.role = role ?? foundUser.role;
     foundUser.email = email ?? foundUser.email;
@@ -81,9 +74,7 @@ export class UsersRepository
       return await this.user.save(foundUser);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException(
-          'User with this username or email already exists',
-        );
+        throw new ConflictException('User with this email already exists');
       }
       throw new InternalServerErrorException(error.message);
     }

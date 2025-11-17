@@ -17,12 +17,7 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto): Promise<any> {
-    let user: any;
-    if (loginDto.login.includes('@')) {
-      user = await this.authRepository.getUserByEmail(loginDto.login);
-    } else {
-      user = await this.authRepository.getUserByUserName(loginDto.login);
-    }
+    const user = await this.authRepository.getUserByEmail(loginDto.email);
 
     if (!user) {
       throw new NotFoundException();
@@ -34,12 +29,10 @@ export class AuthService {
       throw new UnauthorizedException('username or password is incorrect');
     }
 
-    const { id, username, role, email, student, teacher, departmentHead } =
-      user;
+    const { id, role, email, student, teacher, departmentHead } = user;
 
     const payload: any = {
       sub: id,
-      username,
       role,
       email,
     };
@@ -63,7 +56,7 @@ export class AuthService {
 
     const token = await this.jwtService.signAsync(payload);
 
-    delete user.password;
+    user.password = '';
 
     return { user, token };
   }

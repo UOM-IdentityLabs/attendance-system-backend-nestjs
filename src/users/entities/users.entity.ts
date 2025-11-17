@@ -6,9 +6,6 @@ import { Column, Entity, OneToOne } from 'typeorm';
 
 @Entity()
 export class Users extends CoreEntity {
-  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
-  username: string;
-
   @Column({ type: 'varchar', length: 255, nullable: false })
   password: string;
 
