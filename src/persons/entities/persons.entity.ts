@@ -22,9 +22,6 @@ export class Persons extends CoreEntity {
   image?: string;
 
   @Column({ type: 'varchar', nullable: true, unique: true })
-  email?: string;
-
-  @Column({ type: 'varchar', nullable: true, unique: true })
   phone?: string;
 
   @Column({ type: 'date', nullable: false })

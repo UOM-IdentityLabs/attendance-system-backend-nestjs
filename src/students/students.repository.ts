@@ -1,16 +1,19 @@
 import {
+  BadRequestException,
   ConflictException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { IRepository } from 'src/common/interfaces/repository.interfance.tsrepository.interfance';
 import { CreateStudentsDto } from './dto/create-students.dto';
+import { Bcrypt } from 'src/common/classes/bcrypt.class';
 import { Students } from './entities/students.entity';
 import { UpdateStudentsDto } from './dto/update-students.dto';
 import { GetStudentsDto } from './dto/get-students.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult } from 'typeorm';
+import { Repository, DeleteResult, DataSource } from 'typeorm';
 import { CollegeYears } from 'src/college_years/entities/college-years.entity';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Groups } from 'src/groups/entities/groups.entity';
@@ -25,50 +28,75 @@ export class StudentsRepository
   constructor(
     @InjectRepository(Students)
     private student: Repository<Students>,
-    @InjectRepository(Persons)
-    private person: Repository<Persons>,
-    @InjectRepository(Users)
-    private user: Repository<Users>,
-    @InjectRepository(Groups)
-    private group: Repository<Groups>,
-    @InjectRepository(Departments)
-    private department: Repository<Departments>,
-    @InjectRepository(CollegeYears)
-    private collegeYear: Repository<CollegeYears>,
+    private bcrypt: Bcrypt,
+    private dataSource: DataSource,
   ) {}
 
-  async create(createDto: CreateStudentsDto): Promise<Students> {
-    const { personId, userId, groupId, departmentId, collegeYearId } =
-      createDto;
-
-    const newStudent = new Students();
-    const newPerson = new Persons();
-    const newUser = new Users();
-    const newGroup = new Groups();
-    const newDepartment = new Departments();
-    const newCollegeYear = new CollegeYears();
-
-    newPerson.id = personId;
-    newUser.id = userId;
-    newGroup.id = groupId;
-    newDepartment.id = departmentId;
-    newCollegeYear.id = collegeYearId;
-
-    newStudent.person = newPerson;
-    newStudent.user = newUser;
-    newStudent.group = newGroup;
-    newStudent.department = newDepartment;
-    newStudent.collegeYear = newCollegeYear;
+  async create(createDto: CreateStudentsDto, userReq: any): Promise<Students> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
-      return await this.student.save(newStudent);
-    } catch (error) {
-      if (error.code === '23503')
-        throw new ConflictException('Referenced entity does not exist');
-      if (error.code === '23505')
-        throw new ConflictException('Student already exists');
+      const existingUser = await queryRunner.manager.findOne(Users, {
+        where: { email: createDto.email },
+      });
+      if (existingUser) {
+        throw new ConflictException('Email already exists');
+      }
 
-      throw new InternalServerErrorException(error.message);
+      const person = queryRunner.manager.create(Persons, {
+        firstName: createDto.firstName,
+        secondName: createDto.secondName,
+        thirdName: createDto.thirdName,
+        fourthName: createDto.fourthName,
+        birthDate: createDto.birthDate,
+        phone: createDto.phone,
+        image: createDto.image,
+      });
+      const savedPerson = await queryRunner.manager.save(person);
+
+      const hashedPassword = await this.bcrypt.hashUserPassword(
+        createDto.password,
+      );
+      const userData = queryRunner.manager.create(Users, {
+        email: createDto.email,
+        password: hashedPassword,
+        role: 'student',
+      });
+      const savedUser = await queryRunner.manager.save(userData);
+
+      const studentData = queryRunner.manager.create(Students, {
+        person: savedPerson,
+        user: savedUser,
+        group: { id: createDto.groupId },
+        department: { id: userReq.departmentId },
+        collegeYear: { id: createDto.collegeYearId },
+      });
+      const savedStudent = await queryRunner.manager.save(studentData);
+
+      await queryRunner.commitTransaction();
+
+      return savedStudent;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      if (error.code === '23505') {
+        throw new ConflictException('Email or phone number already exists');
+      }
+      if (error.code === '23503') {
+        throw new BadRequestException('Referenced entity does not exist');
+      }
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new BadRequestException(
+        `Failed to create student: ${error.message}`,
+      );
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -112,20 +140,19 @@ export class StudentsRepository
   async update(id: string, updateDto: UpdateStudentsDto): Promise<Students> {
     const foundStudent = await this.getById(id, {});
 
-    const { personId, userId, groupId, departmentId, collegeYearId } =
-      updateDto;
-
-    if (personId) {
-      const newPerson = new Persons();
-      newPerson.id = personId;
-      foundStudent.person = newPerson;
-    }
-
-    if (userId) {
-      const newUser = new Users();
-      newUser.id = userId;
-      foundStudent.user = newUser;
-    }
+    const {
+      groupId,
+      collegeYearId,
+      firstName,
+      secondName,
+      thirdName,
+      fourthName,
+      email,
+      password,
+      phone,
+      image,
+      birthDate,
+    } = updateDto;
 
     if (groupId) {
       const newGroup = new Groups();
@@ -133,16 +160,25 @@ export class StudentsRepository
       foundStudent.group = newGroup;
     }
 
-    if (departmentId) {
-      const newDepartment = new Departments();
-      newDepartment.id = departmentId;
-      foundStudent.department = newDepartment;
-    }
-
     if (collegeYearId) {
       const newCollegeYear = new CollegeYears();
       newCollegeYear.id = collegeYearId;
       foundStudent.collegeYear = newCollegeYear;
+    }
+
+    foundStudent.person.firstName = firstName ?? foundStudent.person.firstName;
+    foundStudent.person.secondName =
+      secondName ?? foundStudent.person.secondName;
+    foundStudent.person.thirdName = thirdName ?? foundStudent.person.thirdName;
+    foundStudent.person.fourthName =
+      fourthName ?? foundStudent.person.fourthName;
+    foundStudent.person.phone = phone ?? foundStudent.person.phone;
+    foundStudent.person.image = image ?? foundStudent.person.image;
+    foundStudent.person.birthDate = birthDate ?? foundStudent.person.birthDate;
+
+    foundStudent.user.email = email ?? foundStudent.user.email;
+    if (password) {
+      foundStudent.user.password = await this.bcrypt.hashUserPassword(password);
     }
 
     try {

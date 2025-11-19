@@ -9,6 +9,7 @@ import { Departments } from 'src/departments/entities/departments.entity';
 import { Groups } from 'src/groups/entities/groups.entity';
 import { Persons } from 'src/persons/entities/persons.entity';
 import { Users } from 'src/users/entities/users.entity';
+import { Bcrypt } from 'src/common/classes/bcrypt.class';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { Users } from 'src/users/entities/users.entity';
     ]),
   ],
   controllers: [StudentsController],
-  providers: [StudentsService, StudentsRepository],
+  providers: [StudentsService, StudentsRepository, Bcrypt],
 })
 export class StudentsModule {}

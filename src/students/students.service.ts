@@ -14,8 +14,8 @@ export class StudentsService
 {
   constructor(private readonly studentsRepo: StudentsRepository) {}
 
-  create(createDto: CreateStudentsDto): Promise<Students> {
-    return this.studentsRepo.create(createDto);
+  create(createDto: CreateStudentsDto, userReq: any): Promise<Students> {
+    return this.studentsRepo.create(createDto, userReq);
   }
 
   getAll(query: GetStudentsDto) {

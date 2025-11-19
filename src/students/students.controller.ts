@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentsDto } from './dto/create-students.dto';
@@ -18,8 +19,8 @@ export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
   @Post()
-  create(@Body() createDto: CreateStudentsDto) {
-    return this.studentsService.create(createDto);
+  create(@Body() createDto: CreateStudentsDto, @Req() req) {
+    return this.studentsService.create(createDto, req.user);
   }
 
   @Get()
