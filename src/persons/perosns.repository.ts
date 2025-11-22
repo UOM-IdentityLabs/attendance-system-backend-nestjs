@@ -40,7 +40,7 @@ export class PersonsRepository
     newPerson.thirdName = thirdName;
     newPerson.fourthName = fourthName;
     newPerson.image = image;
-    newPerson.email = email;
+    //newPerson.email = email;
     newPerson.phone = phone;
     newPerson.birthDate = birthDate;
 
@@ -67,7 +67,7 @@ export class PersonsRepository
         { secondName: search ? ILike(`%${search}%`) : undefined },
         { thirdName: search ? ILike(`%${search}%`) : undefined },
         { fourthName: search ? ILike(`%${search}%`) : undefined },
-        { email: search ? ILike(`%${search}%`) : undefined },
+        //{ email: search ? ILike(`%${search}%`) : undefined },
         { phone: search ? ILike(`%${search}%`) : undefined },
       ],
     });
@@ -102,7 +102,7 @@ export class PersonsRepository
     foundPerson.thirdName = thirdName ?? foundPerson.thirdName;
     foundPerson.fourthName = fourthName ?? foundPerson.fourthName;
     foundPerson.image = image ?? foundPerson.image;
-    foundPerson.email = email ?? foundPerson.email;
+    //foundPerson.email = email ?? foundPerson.email;
     foundPerson.phone = phone ?? foundPerson.phone;
     foundPerson.birthDate = birthDate ?? foundPerson.birthDate;
 
