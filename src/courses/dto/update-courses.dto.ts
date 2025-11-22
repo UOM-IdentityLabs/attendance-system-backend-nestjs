@@ -7,10 +7,5 @@ export class UpdateCoursesDto extends PartialType(CreateCoursesDto) {
   @IsString()
   @IsNotEmpty()
   @Type(() => String)
-  departmentId: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Type(() => String)
   collegeYearId: string;
 }

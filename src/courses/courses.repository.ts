@@ -28,14 +28,14 @@ export class CoursesRepository
     private collegeYear: Repository<CollegeYears>,
   ) {}
 
-  async create(createDto: CreateCoursesDto): Promise<Courses> {
-    const { courseName, semester, departmentId, collegeYearId } = createDto;
+  async create(createDto: CreateCoursesDto, userReq: any): Promise<Courses> {
+    const { courseName, semester, collegeYearId } = createDto;
 
     const newCourse = new Courses();
-    const newDepartment = new Departments();
     const newCollegeYear = new CollegeYears();
+    const newDepartment = new Departments();
 
-    newDepartment.id = departmentId;
+    newDepartment.id = userReq.departmentId;
     newCollegeYear.id = collegeYearId;
     newCourse.courseName = courseName;
     newCourse.semester = semester;
@@ -52,13 +52,16 @@ export class CoursesRepository
     }
   }
 
-  async getAll(query: GetCoursesDto) {
+  async getAll(query: GetCoursesDto, userReq: any) {
     const { search, limit, offset } = query;
 
     const [courses, total] = await this.course.findAndCount({
       take: limit ?? 100,
       skip: offset ?? 0,
-      where: { courseName: search ? ILike(`%${search}%`) : undefined },
+      where: {
+        courseName: search ? ILike(`%${search}%`) : undefined,
+        department: { id: userReq.departmentId },
+      },
       relations: ['department', 'collegeYear'],
     });
 
@@ -79,14 +82,11 @@ export class CoursesRepository
   async update(id: string, updateDto: UpdateCoursesDto): Promise<Courses> {
     const foundCourse = await this.getById(id, {});
 
-    const { courseName, semester, departmentId, collegeYearId } = updateDto;
+    const { courseName, semester, collegeYearId } = updateDto;
 
-    const newDepartment = new Departments();
     const newCollegeYear = new CollegeYears();
 
-    newDepartment.id = departmentId;
     newCollegeYear.id = collegeYearId;
-    foundCourse.department = newDepartment ?? foundCourse.department;
     foundCourse.collegeYear = newCollegeYear ?? foundCourse.collegeYear;
     foundCourse.courseName = courseName ?? foundCourse.courseName;
     foundCourse.semester = semester ?? foundCourse.semester;

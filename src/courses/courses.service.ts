@@ -14,12 +14,12 @@ export class CoursesService
 {
   constructor(private readonly coursesRepo: CoursesRepository) {}
 
-  create(createDto: CreateCoursesDto): Promise<Courses> {
-    return this.coursesRepo.create(createDto);
+  create(createDto: CreateCoursesDto, userReq: any): Promise<Courses> {
+    return this.coursesRepo.create(createDto, userReq);
   }
 
-  getAll(query: GetCoursesDto) {
-    return this.coursesRepo.getAll(query);
+  getAll(query: GetCoursesDto, userReq: any) {
+    return this.coursesRepo.getAll(query, userReq);
   }
 
   getById(id: string, query: GetCoursesDto): Promise<Courses> {

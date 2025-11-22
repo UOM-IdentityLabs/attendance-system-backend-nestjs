@@ -18,13 +18,13 @@ export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Post()
-  create(@Body() createDto: CreateCoursesDto) {
-    return this.coursesService.create(createDto);
+  create(@Body() createDto: CreateCoursesDto, req: any) {
+    return this.coursesService.create(createDto, req.user);
   }
 
   @Get()
-  getAll(@Query() query: GetCoursesDto) {
-    return this.coursesService.getAll(query);
+  getAll(@Query() query: GetCoursesDto, req: any) {
+    return this.coursesService.getAll(query, req.user);
   }
 
   @Get(':id')
