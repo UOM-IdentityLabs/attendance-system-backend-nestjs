@@ -24,8 +24,8 @@ export class StudentsController {
   }
 
   @Get()
-  getAll(@Query() query: GetStudentsDto) {
-    return this.studentsService.getAll(query);
+  getAll(@Query() query: GetStudentsDto, @Req() req) {
+    return this.studentsService.getAll(query, req.user);
   }
 
   @Get(':id')

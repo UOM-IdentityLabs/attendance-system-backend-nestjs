@@ -100,7 +100,7 @@ export class StudentsRepository
     }
   }
 
-  async getAll(query: GetStudentsDto) {
+  async getAll(query: GetStudentsDto, userReq: any) {
     const { search, limit, offset } = query;
 
     const queryBuilder = this.student
@@ -109,12 +109,15 @@ export class StudentsRepository
       .leftJoinAndSelect('student.user', 'user')
       .leftJoinAndSelect('student.group', 'group')
       .leftJoinAndSelect('student.department', 'department')
-      .leftJoinAndSelect('student.collegeYear', 'collegeYear');
+      .leftJoinAndSelect('student.collegeYear', 'collegeYear')
+      .where('department.id = :departmentId', {
+        departmentId: userReq.departmentId,
+      });
 
     if (search) {
-      queryBuilder.where(
-        'person.firstName ILIKE :search OR person.secondName ILIKE :search OR person.thirdName ILIKE :search OR person.fourthName ILIKE :search OR department.departmentName ILIKE :search',
-        { search: `%${search}%` },
+      queryBuilder.andWhere(
+        '(person.firstName ILIKE :search OR person.secondName ILIKE :search OR person.thirdName ILIKE :search OR person.fourthName ILIKE :search) AND student.departmentId = :departmentId',
+        { search: `%${search}%`, departmentId: userReq.departmentId },
       );
     }
 

@@ -18,8 +18,8 @@ export class StudentsService
     return this.studentsRepo.create(createDto, userReq);
   }
 
-  getAll(query: GetStudentsDto) {
-    return this.studentsRepo.getAll(query);
+  getAll(query: GetStudentsDto, userReq: any) {
+    return this.studentsRepo.getAll(query, userReq);
   }
 
   getById(id: string, query: GetStudentsDto): Promise<Students> {
