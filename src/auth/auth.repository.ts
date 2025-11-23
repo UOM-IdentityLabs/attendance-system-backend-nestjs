@@ -7,26 +7,26 @@ import { Repository } from 'typeorm';
 export class AuthRepository {
   constructor(@InjectRepository(Users) private user: Repository<Users>) {}
 
-  async getUserByUserName(username: string): Promise<Users> {
-    const basicUser = await this.user.findOne({
-      where: { username },
-    });
+  // async getUserByUserName(username: string): Promise<Users> {
+  //   const basicUser = await this.user.findOne({
+  //     where: { username },
+  //   });
 
-    if (!basicUser)
-      throw new UnauthorizedException('username or password is incorrect');
+  //   if (!basicUser)
+  //     throw new UnauthorizedException('username or password is incorrect');
 
-    const relations = this.getRelationsByRole(basicUser.role);
+  //   const relations = this.getRelationsByRole(basicUser.role);
 
-    const user = await this.user.findOne({
-      where: { username },
-      relations,
-    });
+  //   const user = await this.user.findOne({
+  //     where: { username },
+  //     relations,
+  //   });
 
-    if (!user)
-      throw new UnauthorizedException('username or password is incorrect');
+  //   if (!user)
+  //     throw new UnauthorizedException('username or password is incorrect');
 
-    return user;
-  }
+  //   return user;
+  // }
 
   async getUserByEmail(email: string): Promise<Users> {
     const basicUser = await this.user.findOne({
@@ -34,7 +34,7 @@ export class AuthRepository {
     });
 
     if (!basicUser)
-      throw new UnauthorizedException('username or password is incorrect');
+      throw new UnauthorizedException('email or password is incorrect');
 
     const relations = this.getRelationsByRole(basicUser.role);
 
@@ -44,7 +44,7 @@ export class AuthRepository {
     });
 
     if (!user)
-      throw new UnauthorizedException('username or password is incorrect');
+      throw new UnauthorizedException('email or password is incorrect');
 
     return user;
   }
