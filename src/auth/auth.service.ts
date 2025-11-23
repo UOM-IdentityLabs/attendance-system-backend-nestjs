@@ -26,7 +26,7 @@ export class AuthService {
     if (
       !(await this.bcrypt.isValidPassword(loginDto.password, user.password))
     ) {
-      throw new UnauthorizedException('username or password is incorrect');
+      throw new UnauthorizedException('email or password is incorrect');
     }
 
     const { id, role, email, student, teacher, departmentHead } = user;
