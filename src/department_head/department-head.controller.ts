@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from '@nestjs/common';
 import { DepartmentHeadService } from './department-head.service';
 import { CreateDepartmentHeadDto } from './dto/create-department-head.dto';
@@ -18,13 +19,13 @@ export class DepartmentHeadController {
   constructor(private readonly departmentHeadService: DepartmentHeadService) {}
 
   @Post()
-  create(@Body() createDto: CreateDepartmentHeadDto) {
-    return this.departmentHeadService.create(createDto);
+  create(@Body() createDto: CreateDepartmentHeadDto, @Req() req: any) {
+    return this.departmentHeadService.create(createDto, req.user);
   }
 
   @Get()
-  getAll(@Query() query: GetDepartmentHeadDto) {
-    return this.departmentHeadService.getAll(query);
+  getAll(@Query() query: GetDepartmentHeadDto, @Req() req: any) {
+    return this.departmentHeadService.getAll(query, req.user);
   }
 
   @Get(':id')

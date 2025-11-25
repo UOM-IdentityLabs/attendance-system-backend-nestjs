@@ -19,12 +19,15 @@ export class DepartmentHeadService
 {
   constructor(private readonly departmentHeadRepo: DepartmentHeadRepository) {}
 
-  create(createDto: CreateDepartmentHeadDto): Promise<DepartmentHead> {
-    return this.departmentHeadRepo.create(createDto);
+  create(
+    createDto: CreateDepartmentHeadDto,
+    userReq: any,
+  ): Promise<DepartmentHead> {
+    return this.departmentHeadRepo.create(createDto, userReq);
   }
 
-  getAll(query: GetDepartmentHeadDto) {
-    return this.departmentHeadRepo.getAll(query);
+  getAll(query: GetDepartmentHeadDto, userReq: any) {
+    return this.departmentHeadRepo.getAll(query, userReq);
   }
 
   getById(id: string, query: GetDepartmentHeadDto): Promise<DepartmentHead> {
