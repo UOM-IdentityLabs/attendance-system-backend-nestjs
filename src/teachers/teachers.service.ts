@@ -14,12 +14,12 @@ export class TeachersService
 {
   constructor(private readonly teachersRepo: TeachersRepository) {}
 
-  create(createDto: CreateTeachersDto): Promise<Teachers> {
-    return this.teachersRepo.create(createDto);
+  create(createDto: CreateTeachersDto, userReq: any): Promise<Teachers> {
+    return this.teachersRepo.create(createDto, userReq);
   }
 
-  getAll(query: GetTeachersDto) {
-    return this.teachersRepo.getAll(query);
+  getAll(query: GetTeachersDto, userReq: any) {
+    return this.teachersRepo.getAll(query, userReq);
   }
 
   getById(id: string, query: GetTeachersDto): Promise<Teachers> {

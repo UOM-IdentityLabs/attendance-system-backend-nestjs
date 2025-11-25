@@ -1,5 +1,7 @@
 import {
+  BadRequestException,
   ConflictException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -10,10 +12,10 @@ import { Teachers } from './entities/teachers.entity';
 import { UpdateTeachersDto } from './dto/update-teachers.dto';
 import { GetTeachersDto } from './dto/get-teachers.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult, ILike } from 'typeorm';
-import { Departments } from 'src/departments/entities/departments.entity';
+import { Repository, DeleteResult, ILike, DataSource } from 'typeorm';
 import { Persons } from 'src/persons/entities/persons.entity';
 import { Users } from 'src/users/entities/users.entity';
+import { Bcrypt } from 'src/common/classes/bcrypt.class';
 
 @Injectable()
 export class TeachersRepository
@@ -23,52 +25,100 @@ export class TeachersRepository
   constructor(
     @InjectRepository(Teachers)
     private teacher: Repository<Teachers>,
-    @InjectRepository(Departments)
-    private department: Repository<Departments>,
-    @InjectRepository(Persons)
-    private person: Repository<Persons>,
-    @InjectRepository(Users)
-    private user: Repository<Users>,
+    private bcrypt: Bcrypt,
+    private dataSource: DataSource,
   ) {}
 
-  async create(createDto: CreateTeachersDto): Promise<Teachers> {
-    const { personId, userId, specialization, departmentId } = createDto;
-
-    const newTeacher = new Teachers();
-    const newPerson = new Persons();
-    const newUser = new Users();
-    const newDepartment = new Departments();
-
-    newPerson.id = personId;
-    newUser.id = userId;
-    newDepartment.id = departmentId;
-
-    newTeacher.person = newPerson;
-    newTeacher.user = newUser;
-    newTeacher.specialization = specialization;
-    newTeacher.department = newDepartment;
+  async create(createDto: CreateTeachersDto, userReq: any): Promise<Teachers> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
-      return await this.teacher.save(newTeacher);
-    } catch (error) {
-      if (error.code === '23503')
-        throw new ConflictException('Referenced entity does not exist');
-      if (error.code === '23505')
-        throw new ConflictException('Teacher already exists');
+      const existingUser = await queryRunner.manager.findOne(Users, {
+        where: { email: createDto.email },
+      });
+      if (existingUser) {
+        throw new ConflictException('Email already exists');
+      }
 
-      throw new InternalServerErrorException(error.message);
+      const person = queryRunner.manager.create(Persons, {
+        firstName: createDto.firstName,
+        secondName: createDto.secondName,
+        thirdName: createDto.thirdName,
+        fourthName: createDto.fourthName,
+        birthDate: createDto.birthDate,
+        phone: createDto.phone,
+        image: createDto.image,
+      });
+      const savedPerson = await queryRunner.manager.save(person);
+
+      const hashedPassword = await this.bcrypt.hashUserPassword(
+        createDto.password,
+      );
+      const userData = queryRunner.manager.create(Users, {
+        email: createDto.email,
+        password: hashedPassword,
+        role: 'teacher',
+      });
+      const savedUser = await queryRunner.manager.save(userData);
+
+      const teacherData = queryRunner.manager.create(Teachers, {
+        person: savedPerson,
+        user: savedUser,
+        specialization: createDto.specialization,
+        department: { id: userReq.departmentId },
+      });
+      const savedTeacher = await queryRunner.manager.save(teacherData);
+
+      await queryRunner.commitTransaction();
+
+      return savedTeacher;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      if (error.code === '23505') {
+        throw new ConflictException('Email or phone number already exists');
+      }
+      if (error.code === '23503') {
+        throw new BadRequestException('Referenced entity does not exist');
+      }
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new BadRequestException(
+        `Failed to create student: ${error.message}`,
+      );
+    } finally {
+      await queryRunner.release();
     }
   }
 
-  async getAll(query: GetTeachersDto) {
+  async getAll(query: GetTeachersDto, userReq: any) {
     const { search, limit, offset } = query;
 
-    const [teachers, total] = await this.teacher.findAndCount({
-      where: search ? [{ specialization: ILike(`%${search}%`) }] : {},
-      relations: ['person', 'user', 'department'],
-      take: limit,
-      skip: offset,
-    });
+    const queryBuilder = this.teacher
+      .createQueryBuilder('teacher')
+      .leftJoinAndSelect('teacher.person', 'person')
+      .leftJoinAndSelect('teacher.user', 'user')
+      .leftJoinAndSelect('teacher.department', 'department')
+      .where('teacher.departmentId = :departmentId', {
+        departmentId: userReq.departmentId,
+      });
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(person.firstName ILIKE :search OR person.secondName ILIKE :search OR person.thirdName ILIKE :search OR person.fourthName ILIKE :search OR teacher.specialization ILIKE :search) AND teacher.departmentId = :departmentId',
+        { search: `%${search}%`, departmentId: userReq.departmentId },
+      );
+    }
+
+    const [teachers, total] = await queryBuilder
+      .take(limit ?? 100)
+      .skip(offset ?? 0)
+      .getManyAndCount();
 
     return { teachers, total };
   }
@@ -85,41 +135,92 @@ export class TeachersRepository
   }
 
   async update(id: string, updateDto: UpdateTeachersDto): Promise<Teachers> {
-    const foundTeacher = await this.getById(id, {});
-
-    const { personId, userId, specialization, departmentId } = updateDto;
-
-    if (personId) {
-      const newPerson = new Persons();
-      newPerson.id = personId;
-      foundTeacher.person = newPerson;
-    }
-
-    if (userId) {
-      const newUser = new Users();
-      newUser.id = userId;
-      foundTeacher.user = newUser;
-    }
-
-    if (specialization) {
-      foundTeacher.specialization = specialization;
-    }
-
-    if (departmentId) {
-      const newDepartment = new Departments();
-      newDepartment.id = departmentId;
-      foundTeacher.department = newDepartment;
-    }
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
-      return await this.teacher.save(foundTeacher);
-    } catch (error) {
-      if (error.code === '23503')
-        throw new ConflictException('Referenced entity does not exist');
-      if (error.code === '23505')
-        throw new ConflictException('Teacher already exists');
+      const foundTeacher = await queryRunner.manager.findOne(Teachers, {
+        where: { id },
+        relations: ['person', 'user', 'department'],
+      });
 
-      throw new InternalServerErrorException(error.message);
+      if (!foundTeacher) {
+        throw new NotFoundException('No teacher found');
+      }
+
+      const {
+        specialization,
+        firstName,
+        secondName,
+        thirdName,
+        fourthName,
+        email,
+        password,
+        phone,
+        image,
+        birthDate,
+      } = updateDto;
+
+      if (email && email !== foundTeacher.user.email) {
+        const existingUser = await queryRunner.manager.findOne(Users, {
+          where: { email },
+        });
+        if (existingUser && existingUser.id !== foundTeacher.user.id) {
+          throw new ConflictException('Email already exists');
+        }
+      }
+
+      foundTeacher.specialization =
+        specialization ?? foundTeacher.specialization;
+
+      foundTeacher.person.firstName =
+        firstName ?? foundTeacher.person.firstName;
+      foundTeacher.person.secondName =
+        secondName ?? foundTeacher.person.secondName;
+      foundTeacher.person.thirdName =
+        thirdName ?? foundTeacher.person.thirdName;
+      foundTeacher.person.fourthName =
+        fourthName ?? foundTeacher.person.fourthName;
+      foundTeacher.person.phone = phone ?? foundTeacher.person.phone;
+      foundTeacher.person.image = image ?? foundTeacher.person.image;
+      foundTeacher.person.birthDate =
+        birthDate ?? foundTeacher.person.birthDate;
+
+      foundTeacher.user.email = email ?? foundTeacher.user.email;
+      if (password) {
+        foundTeacher.user.password =
+          await this.bcrypt.hashUserPassword(password);
+      }
+
+      await queryRunner.manager.save(Persons, foundTeacher.person);
+      await queryRunner.manager.save(Users, foundTeacher.user);
+      const savedTeacher = await queryRunner.manager.save(
+        Teachers,
+        foundTeacher,
+      );
+
+      await queryRunner.commitTransaction();
+      return savedTeacher;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      if (error.code === '23503') {
+        throw new BadRequestException('Referenced entity does not exist');
+      }
+      if (error.code === '23505') {
+        throw new ConflictException('Email or phone number already exists');
+      }
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new BadRequestException(
+        `Failed to update teacher: ${error.message}`,
+      );
+    } finally {
+      await queryRunner.release();
     }
   }
 

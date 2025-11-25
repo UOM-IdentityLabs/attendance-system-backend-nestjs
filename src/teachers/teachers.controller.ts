@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from '@nestjs/common';
 import { TeachersService } from './teachers.service';
 import { CreateTeachersDto } from './dto/create-teachers.dto';
@@ -18,13 +19,13 @@ export class TeachersController {
   constructor(private readonly teachersService: TeachersService) {}
 
   @Post()
-  create(@Body() createDto: CreateTeachersDto) {
-    return this.teachersService.create(createDto);
+  create(@Body() createDto: CreateTeachersDto, @Req() req: any) {
+    return this.teachersService.create(createDto, req.user);
   }
 
   @Get()
-  getAll(@Query() query: GetTeachersDto) {
-    return this.teachersService.getAll(query);
+  getAll(@Query() query: GetTeachersDto, @Req() req: any) {
+    return this.teachersService.getAll(query, req.user);
   }
 
   @Get(':id')

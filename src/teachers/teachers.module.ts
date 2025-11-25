@@ -7,10 +7,11 @@ import { TeachersRepository } from './teachers.repository';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Persons } from 'src/persons/entities/persons.entity';
 import { Users } from 'src/users/entities/users.entity';
+import { Bcrypt } from 'src/common/classes/bcrypt.class';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Teachers, Departments, Persons, Users])],
   controllers: [TeachersController],
-  providers: [TeachersService, TeachersRepository],
+  providers: [TeachersService, TeachersRepository, Bcrypt],
 })
 export class TeachersModule {}
