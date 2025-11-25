@@ -141,58 +141,98 @@ export class StudentsRepository
   }
 
   async update(id: string, updateDto: UpdateStudentsDto): Promise<Students> {
-    const foundStudent = await this.getById(id, {});
-
-    const {
-      groupId,
-      collegeYearId,
-      firstName,
-      secondName,
-      thirdName,
-      fourthName,
-      email,
-      password,
-      phone,
-      image,
-      birthDate,
-    } = updateDto;
-
-    if (groupId) {
-      const newGroup = new Groups();
-      newGroup.id = groupId;
-      foundStudent.group = newGroup;
-    }
-
-    if (collegeYearId) {
-      const newCollegeYear = new CollegeYears();
-      newCollegeYear.id = collegeYearId;
-      foundStudent.collegeYear = newCollegeYear;
-    }
-
-    foundStudent.person.firstName = firstName ?? foundStudent.person.firstName;
-    foundStudent.person.secondName =
-      secondName ?? foundStudent.person.secondName;
-    foundStudent.person.thirdName = thirdName ?? foundStudent.person.thirdName;
-    foundStudent.person.fourthName =
-      fourthName ?? foundStudent.person.fourthName;
-    foundStudent.person.phone = phone ?? foundStudent.person.phone;
-    foundStudent.person.image = image ?? foundStudent.person.image;
-    foundStudent.person.birthDate = birthDate ?? foundStudent.person.birthDate;
-
-    foundStudent.user.email = email ?? foundStudent.user.email;
-    if (password) {
-      foundStudent.user.password = await this.bcrypt.hashUserPassword(password);
-    }
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
-      return await this.student.save(foundStudent);
-    } catch (error) {
-      if (error.code === '23503')
-        throw new ConflictException('Referenced entity does not exist');
-      if (error.code === '23505')
-        throw new ConflictException('Student already exists');
+      const foundStudent = await queryRunner.manager.findOne(Students, {
+        where: { id },
+        relations: ['person', 'user', 'group', 'department', 'collegeYear'],
+      });
 
-      throw new InternalServerErrorException(error.message);
+      if (!foundStudent) {
+        throw new NotFoundException('No student found');
+      }
+
+      const {
+        groupId,
+        collegeYearId,
+        firstName,
+        secondName,
+        thirdName,
+        fourthName,
+        email,
+        password,
+        phone,
+        image,
+        birthDate,
+      } = updateDto;
+
+      if (email && email !== foundStudent.user.email) {
+        const existingUser = await queryRunner.manager.findOne(Users, {
+          where: { email },
+        });
+        if (existingUser && existingUser.id !== foundStudent.user.id) {
+          throw new ConflictException('Email already exists');
+        }
+      }
+
+      if (groupId) {
+        foundStudent.group = { id: groupId } as Groups;
+      }
+
+      if (collegeYearId) {
+        foundStudent.collegeYear = { id: collegeYearId } as CollegeYears;
+      }
+
+      foundStudent.person.firstName =
+        firstName ?? foundStudent.person.firstName;
+      foundStudent.person.secondName =
+        secondName ?? foundStudent.person.secondName;
+      foundStudent.person.thirdName =
+        thirdName ?? foundStudent.person.thirdName;
+      foundStudent.person.fourthName =
+        fourthName ?? foundStudent.person.fourthName;
+      foundStudent.person.phone = phone ?? foundStudent.person.phone;
+      foundStudent.person.image = image ?? foundStudent.person.image;
+      foundStudent.person.birthDate =
+        birthDate ?? foundStudent.person.birthDate;
+
+      foundStudent.user.email = email ?? foundStudent.user.email;
+      if (password) {
+        foundStudent.user.password =
+          await this.bcrypt.hashUserPassword(password);
+      }
+
+      await queryRunner.manager.save(Persons, foundStudent.person);
+      await queryRunner.manager.save(Users, foundStudent.user);
+      const savedStudent = await queryRunner.manager.save(
+        Students,
+        foundStudent,
+      );
+
+      await queryRunner.commitTransaction();
+      return savedStudent;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      if (error.code === '23503') {
+        throw new BadRequestException('Referenced entity does not exist');
+      }
+      if (error.code === '23505') {
+        throw new ConflictException('Email or phone number already exists');
+      }
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new BadRequestException(
+        `Failed to update student: ${error.message}`,
+      );
+    } finally {
+      await queryRunner.release();
     }
   }
 
