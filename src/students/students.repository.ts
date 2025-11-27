@@ -19,6 +19,7 @@ import { Departments } from 'src/departments/entities/departments.entity';
 import { Groups } from 'src/groups/entities/groups.entity';
 import { Persons } from 'src/persons/entities/persons.entity';
 import { Users } from 'src/users/entities/users.entity';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
 
 @Injectable()
 export class StudentsRepository
@@ -62,7 +63,7 @@ export class StudentsRepository
       const userData = queryRunner.manager.create(Users, {
         email: createDto.email,
         password: hashedPassword,
-        role: 'student',
+        role: UserRoleEnum.STUDENT,
       });
       const savedUser = await queryRunner.manager.save(userData);
 

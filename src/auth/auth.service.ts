@@ -7,6 +7,7 @@ import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { Bcrypt } from 'src/common/classes/bcrypt.class';
 import { LoginDto } from './dto/login.dto';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -37,19 +38,19 @@ export class AuthService {
       email,
     };
 
-    if (role === 'student') {
+    if (role === UserRoleEnum.STUDENT) {
       payload.studentId = student?.id;
       payload.departmentId = student?.department?.id;
       payload.groupId = student?.group?.id;
       payload.collegeYearId = student?.collegeYear?.id;
     }
 
-    if (role === 'teacher') {
+    if (role === UserRoleEnum.TEACHER) {
       payload.teacherId = teacher?.id;
       payload.departmentId = teacher?.department?.id;
     }
 
-    if (role === 'department_head') {
+    if (role === UserRoleEnum.DEPARTMENT_HEAD) {
       payload.departmentHeadId = departmentHead?.id;
       payload.departmentId = departmentHead?.department?.id;
     }

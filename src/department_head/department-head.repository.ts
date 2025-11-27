@@ -17,6 +17,7 @@ import { Departments } from 'src/departments/entities/departments.entity';
 import { Persons } from 'src/persons/entities/persons.entity';
 import { Users } from 'src/users/entities/users.entity';
 import { Bcrypt } from 'src/common/classes/bcrypt.class';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
 
 @Injectable()
 export class DepartmentHeadRepository
@@ -68,7 +69,7 @@ export class DepartmentHeadRepository
       const userData = queryRunner.manager.create(Users, {
         email: createDto.email,
         password: hashedPassword,
-        role: 'department_head',
+        role: UserRoleEnum.DEPARTMENT_HEAD,
       });
       const savedUser = await queryRunner.manager.save(userData);
 

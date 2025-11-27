@@ -16,6 +16,7 @@ import { Repository, DeleteResult, ILike, DataSource } from 'typeorm';
 import { Persons } from 'src/persons/entities/persons.entity';
 import { Users } from 'src/users/entities/users.entity';
 import { Bcrypt } from 'src/common/classes/bcrypt.class';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
 
 @Injectable()
 export class TeachersRepository
@@ -59,7 +60,7 @@ export class TeachersRepository
       const userData = queryRunner.manager.create(Users, {
         email: createDto.email,
         password: hashedPassword,
-        role: 'teacher',
+        role: UserRoleEnum.TEACHER,
       });
       const savedUser = await queryRunner.manager.save(userData);
 
