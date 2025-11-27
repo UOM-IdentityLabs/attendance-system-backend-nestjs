@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/users/entities/users.entity';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -71,17 +72,17 @@ export class AuthRepository {
   }
 
   private getRelationsByRole(role: string): string[] {
-    switch (role.toLowerCase()) {
-      case 'student':
+    switch (role) {
+      case UserRoleEnum.STUDENT:
         return [
           'student',
           'student.group',
           'student.department',
           'student.collegeYear',
         ];
-      case 'teacher':
+      case UserRoleEnum.TEACHER:
         return ['teacher', 'teacher.department'];
-      case 'departmentHead':
+      case UserRoleEnum.DEPARTMENT_HEAD:
         return ['departmentHead', 'departmentHead.department'];
       default:
         return [];
