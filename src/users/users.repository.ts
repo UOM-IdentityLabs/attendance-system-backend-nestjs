@@ -12,6 +12,7 @@ import { Users } from './entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Bcrypt } from 'src/common/classes/bcrypt.class';
+import { UserRoleEnum } from './enums/user-role.enum';
 
 @Injectable()
 export class UsersRepository
@@ -53,6 +54,20 @@ export class UsersRepository
     return { users, total };
   }
 
+  async getMe(userReq: any): Promise<Users> {
+    const relations = this.getRelationsByRole(userReq.role);
+
+    const foundUser = await this.user.findOne({
+      where: { id: userReq.id },
+      relations,
+    });
+
+    if (!foundUser) throw new NotFoundException('no user found');
+
+    foundUser.password = '';
+    return foundUser;
+  }
+
   async getById(id: string, query: GetUsersDto): Promise<Users> {
     const foundUser = await this.user.findOne({ where: { id } });
 
@@ -88,5 +103,28 @@ export class UsersRepository
     }
 
     return deleted;
+  }
+
+  private getRelationsByRole(role: string): string[] {
+    switch (role) {
+      case UserRoleEnum.STUDENT:
+        return [
+          'student',
+          'student.group',
+          'student.department',
+          'student.collegeYear',
+          'student.person',
+        ];
+      case UserRoleEnum.TEACHER:
+        return ['teacher', 'teacher.department', 'teacher.person'];
+      case UserRoleEnum.DEPARTMENT_HEAD:
+        return [
+          'departmentHead',
+          'departmentHead.department',
+          'departmentHead.person',
+        ];
+      default:
+        return [];
+    }
   }
 }

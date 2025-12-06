@@ -21,6 +21,10 @@ export class UsersService
     return this.usersRepository.getAll(query);
   }
 
+  getMe(userReq: any) {
+    return this.usersRepository.getMe(userReq);
+  }
+
   getById(id: string, query: GetUsersDto): Promise<Users> {
     return this.usersRepository.getById(id, query);
   }

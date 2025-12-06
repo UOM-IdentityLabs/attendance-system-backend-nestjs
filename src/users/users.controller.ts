@@ -7,10 +7,13 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUsersDto } from './dto/create-users.dto';
 import { GetUsersDto } from './dto/get-users.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
 @Controller('users')
 export class UsersController {
@@ -24,6 +27,12 @@ export class UsersController {
   @Get()
   getAll(@Query() query: GetUsersDto) {
     return this.usersService.getAll(query);
+  }
+
+  @Get('me')
+  @UseGuards(JwtGuard)
+  getMe(@Req() req: any) {
+    return this.usersService.getMe(req.user);
   }
 
   @Get(':id')
