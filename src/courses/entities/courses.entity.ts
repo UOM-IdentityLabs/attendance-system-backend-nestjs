@@ -25,7 +25,7 @@ export class Courses extends CoreEntity {
   department: Departments;
 
   @ManyToOne(() => CollegeYears, (collegeYear) => collegeYear.courses)
-  @JoinColumn({ name: 'collegeYear_id' })
+  @JoinColumn({ name: 'college_year_id' })
   collegeYear: CollegeYears;
 
   @OneToMany(() => TeacherCourses, (teacherCourse) => teacherCourse.course)
