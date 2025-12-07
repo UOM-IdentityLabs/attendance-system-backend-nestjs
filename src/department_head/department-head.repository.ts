@@ -112,16 +112,17 @@ export class DepartmentHeadRepository
     const queryBuilder = this.departmentHead
       .createQueryBuilder('departmentHead')
       .leftJoinAndSelect('departmentHead.person', 'person')
-      .leftJoinAndSelect('departmentHead.user', 'user')
+      .leftJoin('departmentHead.user', 'user')
+      .addSelect(['user.email', 'user.role'])
       .leftJoinAndSelect('departmentHead.department', 'department')
-      .where('departmentHead.departmentId = :departmentId', {
+      .where('department.id = :departmentId', {
         departmentId: userReq.departmentId,
       });
 
     if (search) {
       queryBuilder.andWhere(
-        '(person.firstName ILIKE :search OR person.secondName ILIKE :search OR person.thirdName ILIKE :search OR person.fourthName ILIKE :search) AND departmentHead.departmentId = :departmentId',
-        { search: `%${search}%`, departmentId: userReq.departmentId },
+        '(person.firstName ILIKE :search OR person.secondName ILIKE :search OR person.thirdName ILIKE :search OR person.fourthName ILIKE :search)',
+        { search: `%${search}%` },
       );
     }
 
