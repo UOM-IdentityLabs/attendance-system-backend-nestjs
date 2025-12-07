@@ -107,7 +107,8 @@ export class StudentsRepository
     const queryBuilder = this.student
       .createQueryBuilder('student')
       .leftJoinAndSelect('student.person', 'person')
-      .leftJoinAndSelect('student.user', 'user')
+      .leftJoin('student.user', 'user')
+      .addSelect(['user.email', 'user.role'])
       .leftJoinAndSelect('student.group', 'group')
       .leftJoinAndSelect('student.department', 'department')
       .leftJoinAndSelect('student.collegeYear', 'collegeYear')

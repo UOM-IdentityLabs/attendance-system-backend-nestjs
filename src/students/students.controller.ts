@@ -8,22 +8,26 @@ import {
   Post,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentsDto } from './dto/create-students.dto';
 import { GetStudentsDto } from './dto/get-students.dto';
 import { UpdateStudentsDto } from './dto/update-students.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
 @Controller('students')
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
   @Post()
+  @UseGuards(JwtGuard)
   create(@Body() createDto: CreateStudentsDto, @Req() req) {
     return this.studentsService.create(createDto, req.user);
   }
 
   @Get()
+  @UseGuards(JwtGuard)
   getAll(@Query() query: GetStudentsDto, @Req() req) {
     return this.studentsService.getAll(query, req.user);
   }
