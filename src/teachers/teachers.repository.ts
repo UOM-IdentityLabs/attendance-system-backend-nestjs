@@ -103,16 +103,17 @@ export class TeachersRepository
     const queryBuilder = this.teacher
       .createQueryBuilder('teacher')
       .leftJoinAndSelect('teacher.person', 'person')
-      .leftJoinAndSelect('teacher.user', 'user')
+      .leftJoin('teacher.user', 'user')
+      .addSelect(['user.email', 'user.role'])
       .leftJoinAndSelect('teacher.department', 'department')
-      .where('teacher.departmentId = :departmentId', {
+      .where('department.id = :departmentId', {
         departmentId: userReq.departmentId,
       });
 
     if (search) {
       queryBuilder.andWhere(
-        '(person.firstName ILIKE :search OR person.secondName ILIKE :search OR person.thirdName ILIKE :search OR person.fourthName ILIKE :search OR teacher.specialization ILIKE :search) AND teacher.departmentId = :departmentId',
-        { search: `%${search}%`, departmentId: userReq.departmentId },
+        '(person.firstName ILIKE :search OR person.secondName ILIKE :search OR person.thirdName ILIKE :search OR person.fourthName ILIKE :search OR teacher.specialization ILIKE :search)',
+        { search: `%${search}%` },
       );
     }
 
