@@ -118,8 +118,8 @@ export class StudentsRepository
 
     if (search) {
       queryBuilder.andWhere(
-        '(person.firstName ILIKE :search OR person.secondName ILIKE :search OR person.thirdName ILIKE :search OR person.fourthName ILIKE :search) AND student.departmentId = :departmentId',
-        { search: `%${search}%`, departmentId: userReq.departmentId },
+        '(person.firstName ILIKE :search OR person.secondName ILIKE :search OR person.thirdName ILIKE :search OR person.fourthName ILIKE :search) ',
+        { search: `%${search}%` },
       );
     }
 
