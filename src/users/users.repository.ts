@@ -58,7 +58,7 @@ export class UsersRepository
     const relations = this.getRelationsByRole(userReq.role);
 
     const foundUser = await this.user.findOne({
-      where: { id: userReq.id },
+      where: { id: userReq.userId },
       relations,
     });
 
