@@ -107,7 +107,10 @@ export class TeachersRepository
       .addSelect(['user.email', 'user.role'])
       .leftJoinAndSelect('teacher.department', 'department')
       .leftJoinAndSelect('teacher.teacherCourses', 'teacherCourses')
-      .leftJoinAndSelect('teacherCourses.course', 'course')
+      .leftJoin('teacherCourses.course', 'course')
+      .addSelect(['course.id', 'course.courseName', 'course.semester'])
+      .leftJoin('course.collegeYear', 'collegeYear')
+      .addSelect(['collegeYear.id', 'collegeYear.yearName'])
       .where('department.id = :departmentId', {
         departmentId: userReq.departmentId,
       });
