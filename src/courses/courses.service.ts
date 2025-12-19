@@ -18,6 +18,10 @@ export class CoursesService
     return this.coursesRepo.create(createDto, userReq);
   }
 
+  getCountAllCourses(): Promise<number> {
+    return this.coursesRepo.getCountAllCourses();
+  }
+
   getAll(query: GetCoursesDto, userReq: any) {
     return this.coursesRepo.getAll(query, userReq);
   }

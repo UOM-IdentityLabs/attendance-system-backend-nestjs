@@ -26,6 +26,12 @@ export class CoursesController {
     return this.coursesService.create(createDto, req.user);
   }
 
+  @Get('count')
+  @UseGuards(JwtGuard)
+  getCountAllCourses() {
+    return this.coursesService.getCountAllCourses();
+  }
+
   @Get()
   @UseGuards(JwtGuard)
   getAll(@Query() query: GetCoursesDto, @Req() req: any) {

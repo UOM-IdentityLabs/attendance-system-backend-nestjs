@@ -52,6 +52,17 @@ export class CoursesRepository
     }
   }
 
+  async getCountAllCourses(): Promise<number> {
+    try {
+      const count = await this.course.count();
+      return count;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to count courses: ${error.message}`,
+      );
+    }
+  }
+
   async getAll(query: GetCoursesDto, userReq: any) {
     const { search, limit, offset } = query;
 
