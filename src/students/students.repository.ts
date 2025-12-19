@@ -101,6 +101,17 @@ export class StudentsRepository
     }
   }
 
+  async getCountAllStudents(): Promise<number> {
+    try {
+      const count = await this.student.count();
+      return count;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to count students: ${error.message}`,
+      );
+    }
+  }
+
   async getAll(query: GetStudentsDto, userReq: any) {
     const { search, limit, offset } = query;
 

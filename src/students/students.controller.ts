@@ -26,6 +26,12 @@ export class StudentsController {
     return this.studentsService.create(createDto, req.user);
   }
 
+  @Get('count')
+  @UseGuards(JwtGuard)
+  getCountAllStudents() {
+    return this.studentsService.getCountAllStudents();
+  }
+
   @Get()
   @UseGuards(JwtGuard)
   getAll(@Query() query: GetStudentsDto, @Req() req) {
