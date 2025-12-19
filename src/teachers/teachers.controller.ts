@@ -26,6 +26,12 @@ export class TeachersController {
     return this.teachersService.create(createDto, req.user);
   }
 
+  @Get('count')
+  @UseGuards(JwtGuard)
+  getCountAllTeachers() {
+    return this.teachersService.getCountAllTeachers();
+  }
+
   @Get()
   @UseGuards(JwtGuard)
   getAll(@Query() query: GetTeachersDto, @Req() req: any) {

@@ -18,6 +18,10 @@ export class TeachersService
     return this.teachersRepo.create(createDto, userReq);
   }
 
+  getCountAllTeachers(): Promise<number> {
+    return this.teachersRepo.getCountAllTeachers();
+  }
+
   getAll(query: GetTeachersDto, userReq: any) {
     return this.teachersRepo.getAll(query, userReq);
   }

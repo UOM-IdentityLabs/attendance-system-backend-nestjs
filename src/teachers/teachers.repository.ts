@@ -97,6 +97,17 @@ export class TeachersRepository
     }
   }
 
+  async getCountAllTeachers(): Promise<number> {
+    try {
+      const count = await this.teacher.count();
+      return count;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to count teachers: ${error.message}`,
+      );
+    }
+  }
+
   async getAll(query: GetTeachersDto, userReq: any) {
     const { search, limit, offset } = query;
 
