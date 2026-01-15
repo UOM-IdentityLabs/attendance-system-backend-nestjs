@@ -9,7 +9,7 @@ export default class TypeOrmConfig {
   static getOrmConfig(configService: ConfigService): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      host: 'postgresql://abdullah:BEoNrzxwBac2mlmYmcAGu3gLFiswyC85@dpg-d5kmb6koud1c73ds8neg-a/attendance_system_2wwe',
+      host: 'postgresql://abdullah:BEoNrzxwBac2mlmYmcAGu3gLFiswyC85@dpg-d5kmb6koud1c73ds8neg-a.frankfurt-postgres.render.com/attendance_system_2wwe',
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
