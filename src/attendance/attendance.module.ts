@@ -6,10 +6,12 @@ import { Attendance } from './entities/attendance.entity';
 import { AttendanceRepository } from './attendance.repository';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Students } from 'src/students/entities/students.entity';
-import { TeacherCourses } from 'src/teacher_courses/entities/teacher-courses.entity';
+import { TeacherCourses } from 'src/teacher-courses/entities/teacher-courses.entity';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    HttpModule,
     TypeOrmModule.forFeature([
       Attendance,
       Departments,

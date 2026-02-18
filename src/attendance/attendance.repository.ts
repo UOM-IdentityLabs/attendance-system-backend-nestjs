@@ -10,10 +10,14 @@ import { Attendance } from './entities/attendance.entity';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { GetAttendanceDto } from './dto/get-attendance.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult } from 'typeorm';
+import { Repository, DeleteResult, In } from 'typeorm';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Students } from 'src/students/entities/students.entity';
-import { TeacherCourses } from 'src/teacher_courses/entities/teacher-courses.entity';
+import { TeacherCourses } from 'src/teacher-courses/entities/teacher-courses.entity';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import FormData from 'form-data';
+import * as fs from 'fs';
 
 @Injectable()
 export class AttendanceRepository
@@ -29,34 +33,58 @@ export class AttendanceRepository
     @InjectRepository(Attendance)
     private attendance: Repository<Attendance>,
     @InjectRepository(Students)
-    private student: Repository<Students>,
-    @InjectRepository(TeacherCourses)
-    private teacherCourse: Repository<TeacherCourses>,
-    @InjectRepository(Departments)
-    private department: Repository<Departments>,
+    private students: Repository<Students>,
+    private readonly httpService: HttpService,
   ) {}
 
-  async create(createDto: CreateAttendanceDto): Promise<Attendance> {
-    const { attendanceDate, status, studentId, teacherCourseId, departmentId } =
-      createDto;
+  async create(createDto: CreateAttendanceDto, req): Promise<Attendance[]> {
+    const { attendanceDate, status, teacherCourseId } = createDto;
 
-    const newAttendance = new Attendance();
-    const newStudent = new Students();
-    const newTeacherCourse = new TeacherCourses();
-    const newDepartment = new Departments();
+    const imagePath =
+      '/home/abdullah/Documents/Projects/attendance-system-ai/image_2.jpg';
 
-    newStudent.id = studentId;
-    newTeacherCourse.id = teacherCourseId;
-    newDepartment.id = departmentId;
+    const form = new FormData();
+    form.append('image', fs.createReadStream(imagePath));
 
-    newAttendance.attendanceDate = attendanceDate;
-    newAttendance.status = status || 'Absent';
-    newAttendance.student = newStudent;
-    newAttendance.teacherCourse = newTeacherCourse;
-    newAttendance.department = newDepartment;
+    const response = await firstValueFrom(
+      this.httpService.post('http://localhost:5000/api/attendance', form, {
+        headers: form.getHeaders(),
+      }),
+    );
+
+    const empIds = response.data.recognized.map((rec) => rec.emp_id);
+
+    const students = await this.students.find({
+      where: { id: In(empIds) },
+    });
+
+    if (!students) {
+      throw new NotFoundException(
+        'No students found for the recognized emp IDs',
+      );
+    }
+
+    const attendanceRecords = students.map((student) => {
+      const newAttendance = new Attendance();
+      const newTeacherCourse = new TeacherCourses();
+      const newDepartment = new Departments();
+
+      newTeacherCourse.id = teacherCourseId;
+      newDepartment.id = req.user.departmentId;
+
+      newAttendance.attendanceDate = attendanceDate;
+      newAttendance.status = status;
+      newAttendance.student = student;
+      newAttendance.teacherCourse = newTeacherCourse;
+      newAttendance.department = newDepartment;
+
+      return newAttendance;
+    });
 
     try {
-      return await this.attendance.save(newAttendance);
+      const savedAttendances = await this.attendance.save(attendanceRecords);
+
+      return savedAttendances;
     } catch (error) {
       if (error.code === '23503')
         throw new ConflictException('Referenced entity does not exist');
@@ -112,8 +140,7 @@ export class AttendanceRepository
   ): Promise<Attendance> {
     const foundAttendance = await this.getById(id, {});
 
-    const { attendanceDate, status, studentId, teacherCourseId, departmentId } =
-      updateDto;
+    const { attendanceDate, status, teacherCourseId } = updateDto;
 
     if (attendanceDate) {
       foundAttendance.attendanceDate = attendanceDate;
@@ -123,23 +150,17 @@ export class AttendanceRepository
       foundAttendance.status = status;
     }
 
-    if (studentId) {
-      const newStudent = new Students();
-      newStudent.id = studentId;
-      foundAttendance.student = newStudent;
-    }
-
     if (teacherCourseId) {
       const newTeacherCourse = new TeacherCourses();
       newTeacherCourse.id = teacherCourseId;
       foundAttendance.teacherCourse = newTeacherCourse;
     }
 
-    if (departmentId) {
-      const newDepartment = new Departments();
-      newDepartment.id = departmentId;
-      foundAttendance.department = newDepartment;
-    }
+    // if (departmentId) {
+    //   const newDepartment = new Departments();
+    //   newDepartment.id = departmentId;
+    //   foundAttendance.department = newDepartment;
+    // }
 
     try {
       return await this.attendance.save(foundAttendance);

@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsDate,
   IsDateString,
   IsNotEmpty,
   IsOptional,
@@ -7,7 +8,7 @@ import {
 } from 'class-validator';
 
 export class CreateAttendanceDto {
-  @IsDateString()
+  @IsDate()
   @IsNotEmpty()
   @Type(() => Date)
   attendanceDate: Date;
@@ -16,11 +17,6 @@ export class CreateAttendanceDto {
   @IsString()
   @Type(() => String)
   status: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Type(() => String)
-  studentId: string;
 
   @IsString()
   @IsNotEmpty()

@@ -19,8 +19,8 @@ export class AttendanceService
 {
   constructor(private readonly attendanceRepo: AttendanceRepository) {}
 
-  create(createDto: CreateAttendanceDto): Promise<Attendance> {
-    return this.attendanceRepo.create(createDto);
+  create(createDto: CreateAttendanceDto, req): Promise<Attendance[]> {
+    return this.attendanceRepo.create(createDto, req);
   }
 
   getAll(query: GetAttendanceDto) {

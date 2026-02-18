@@ -7,19 +7,23 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { GetAttendanceDto } from './dto/get-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
 @Controller('attendance')
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
   @Post()
-  create(@Body() createDto: CreateAttendanceDto) {
-    return this.attendanceService.create(createDto);
+  @UseGuards(JwtGuard)
+  create(@Body() createDto: CreateAttendanceDto, @Req() req) {
+    return this.attendanceService.create(createDto, req);
   }
 
   @Get()
