@@ -7,11 +7,14 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { TeacherCoursesService } from './teacher-courses.service';
 import { CreateTeacherCoursesDto } from './dto/create-teacher-courses.dto';
 import { GetTeacherCoursesDto } from './dto/get-teacher-courses.dto';
 import { UpdateTeacherCoursesDto } from './dto/update-teacher-courses.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
 @Controller('teacher-courses')
 export class TeacherCoursesController {
@@ -25,6 +28,12 @@ export class TeacherCoursesController {
   @Get()
   getAll(@Query() query: GetTeacherCoursesDto) {
     return this.teacherCoursesService.getAll(query);
+  }
+
+  @Get('courses')
+  @UseGuards(JwtGuard)
+  getTeacherCourses(@Req() req: any) {
+    return this.teacherCoursesService.getTeacherCourses(req);
   }
 
   @Get(':id')

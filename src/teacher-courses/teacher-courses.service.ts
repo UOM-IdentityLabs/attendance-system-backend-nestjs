@@ -31,6 +31,10 @@ export class TeacherCoursesService
     return this.teacherCoursesRepo.getById(id, query);
   }
 
+  getTeacherCourses(req: any): Promise<TeacherCourses[]> {
+    return this.teacherCoursesRepo.getTeacherCourses(req);
+  }
+
   update(
     id: string,
     updateDto: UpdateTeacherCoursesDto,
