@@ -1,7 +1,7 @@
 import { Departments } from 'src/departments/entities/departments.entity';
-import { CollegeYears } from 'src/college_years/entities/college-years.entity';
+import { CollegeYears } from 'src/college-years/entities/college-years.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { TeacherCourses } from 'src/teacher_courses/entities/teacher-courses.entity';
+import { TeacherCourses } from 'src/teacher-courses/entities/teacher-courses.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity()

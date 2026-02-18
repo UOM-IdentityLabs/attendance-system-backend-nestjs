@@ -1,6 +1,6 @@
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Attendance } from 'src/attendance/entities/attendance.entity';
-import { CollegeYears } from 'src/college_years/entities/college-years.entity';
+import { CollegeYears } from 'src/college-years/entities/college-years.entity';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Groups } from 'src/groups/entities/groups.entity';
 import { Persons } from 'src/persons/entities/persons.entity';

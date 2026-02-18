@@ -4,7 +4,7 @@ import { StudentsService } from './students.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Students } from './entities/students.entity';
 import { StudentsRepository } from './students.repository';
-import { CollegeYears } from 'src/college_years/entities/college-years.entity';
+import { CollegeYears } from 'src/college-years/entities/college-years.entity';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Groups } from 'src/groups/entities/groups.entity';
 import { Persons } from 'src/persons/entities/persons.entity';

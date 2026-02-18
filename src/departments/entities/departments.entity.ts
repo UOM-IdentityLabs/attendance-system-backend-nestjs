@@ -2,7 +2,7 @@ import { Colleges } from 'src/colleges/entities/colleges.entity';
 import { Courses } from 'src/courses/entities/courses.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Attendance } from 'src/attendance/entities/attendance.entity';
-import { DepartmentHead } from 'src/department_head/entities/department-head.entity';
+import { DepartmentHead } from 'src/department-head/entities/department-head.entity';
 import { Students } from 'src/students/entities/students.entity';
 import { Teachers } from 'src/teachers/entities/teachers.entity';
 import {

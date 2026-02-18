@@ -14,7 +14,7 @@ import { UpdateStudentsDto } from './dto/update-students.dto';
 import { GetStudentsDto } from './dto/get-students.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult, DataSource } from 'typeorm';
-import { CollegeYears } from 'src/college_years/entities/college-years.entity';
+import { CollegeYears } from 'src/college-years/entities/college-years.entity';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Groups } from 'src/groups/entities/groups.entity';
 import { Persons } from 'src/persons/entities/persons.entity';

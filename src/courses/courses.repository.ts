@@ -12,7 +12,7 @@ import { GetCoursesDto } from './dto/get-courses.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult, ILike } from 'typeorm';
 import { Departments } from 'src/departments/entities/departments.entity';
-import { CollegeYears } from 'src/college_years/entities/college-years.entity';
+import { CollegeYears } from 'src/college-years/entities/college-years.entity';
 
 @Injectable()
 export class CoursesRepository

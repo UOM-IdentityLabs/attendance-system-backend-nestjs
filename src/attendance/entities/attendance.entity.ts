@@ -1,7 +1,7 @@
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Students } from 'src/students/entities/students.entity';
-import { TeacherCourses } from 'src/teacher_courses/entities/teacher-courses.entity';
+import { TeacherCourses } from 'src/teacher-courses/entities/teacher-courses.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()

@@ -1,7 +1,7 @@
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Persons } from 'src/persons/entities/persons.entity';
-import { TeacherCourses } from 'src/teacher_courses/entities/teacher-courses.entity';
+import { TeacherCourses } from 'src/teacher-courses/entities/teacher-courses.entity';
 import { Users } from 'src/users/entities/users.entity';
 import {
   Column,

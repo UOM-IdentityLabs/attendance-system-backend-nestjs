@@ -12,10 +12,10 @@ export class CreateAttendanceDto {
   @Type(() => Date)
   attendanceDate: Date;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @Type(() => String)
-  status?: string;
+  status: string;
 
   @IsString()
   @IsNotEmpty()
@@ -26,9 +26,4 @@ export class CreateAttendanceDto {
   @IsNotEmpty()
   @Type(() => String)
   teacherCourseId: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Type(() => String)
-  departmentId: string;
 }
