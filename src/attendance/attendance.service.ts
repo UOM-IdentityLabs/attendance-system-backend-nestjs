@@ -23,8 +23,8 @@ export class AttendanceService
     return this.attendanceRepo.create(createDto, req);
   }
 
-  getAll(query: GetAttendanceDto) {
-    return this.attendanceRepo.getAll(query);
+  getAll(query: GetAttendanceDto, req) {
+    return this.attendanceRepo.getAll(query, req);
   }
 
   getById(id: string, query: GetAttendanceDto): Promise<Attendance> {

@@ -83,7 +83,7 @@ export class AttendanceRepository
 
     try {
       const savedAttendances = await this.attendance.save(attendanceRecords);
-
+      this.markAbsentStudents(req, attendanceDate, teacherCourseId);
       return savedAttendances;
     } catch (error) {
       if (error.code === '23503')
@@ -93,20 +93,16 @@ export class AttendanceRepository
     }
   }
 
-  async getAll(query: GetAttendanceDto) {
-    const { search, limit, offset } = query;
-
+  async getAll(query: GetAttendanceDto, req) {
+    const { search, limit, offset, course } = query;
     const [attendances, total] = await this.attendance.findAndCount({
-      where: [{ status: search }],
-      relations: [
-        'student',
-        'student.person',
-        'teacherCourse',
-        'teacherCourse.course',
-        'teacherCourse.teacher',
-        'teacherCourse.teacher.person',
-        'department',
+      where: [
+        {
+          status: search,
+          teacherCourse: { id: course },
+        },
       ],
+      relations: ['student', 'student.person'],
       take: limit ?? 100,
       skip: offset ?? 0,
     });
@@ -179,5 +175,56 @@ export class AttendanceRepository
       throw new NotFoundException('No attendance record deleted');
 
     return deleted;
+  }
+
+  private async markAbsentStudents(
+    req: any,
+    attendanceDate: Date,
+    teacherCourseId: string,
+  ) {
+    const students = await this.students.find({
+      where: { department: { id: req.user.departmentId } },
+    });
+    const studentIds = students.map((s) => s.id);
+
+    if (studentIds.length === 0) {
+      return;
+    }
+
+    const existingAttendances = await this.attendance.find({
+      relations: ['student'],
+      where: {
+        attendanceDate: attendanceDate,
+        student: { id: In(studentIds) },
+      },
+    });
+
+    const existingStudentIds = existingAttendances.map((a) => a.student.id);
+    const absentStudentIds = studentIds.filter(
+      (id) => !existingStudentIds.includes(id),
+    );
+
+    const absentAttendances = absentStudentIds.map((studentId) => {
+      const newAttendance = new Attendance();
+      const newTeacherCourse = new TeacherCourses();
+      const newDepartment = new Departments();
+
+      newTeacherCourse.id = teacherCourseId;
+      newDepartment.id = req.user.departmentId;
+
+      newAttendance.attendanceDate = attendanceDate;
+      newAttendance.status = 'absent';
+      newAttendance.student = { id: studentId } as any;
+      newAttendance.teacherCourse = newTeacherCourse;
+      newAttendance.department = newDepartment;
+
+      return newAttendance;
+    });
+
+    try {
+      await this.attendance.save(absentAttendances);
+    } catch (error) {
+      console.error('Error marking absent students:', error);
+    }
   }
 }

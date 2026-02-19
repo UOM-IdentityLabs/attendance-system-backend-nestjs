@@ -27,8 +27,8 @@ export class AttendanceController {
   }
 
   @Get()
-  getAll(@Query() query: GetAttendanceDto) {
-    return this.attendanceService.getAll(query);
+  getAll(@Query() query: GetAttendanceDto, @Req() req) {
+    return this.attendanceService.getAll(query, req);
   }
 
   @Get(':id')

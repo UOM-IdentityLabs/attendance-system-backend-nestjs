@@ -7,4 +7,9 @@ export class GetAttendanceDto extends OffsetLimitDto {
   @IsString()
   @Type(() => String)
   search?: string;
+
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  course?: string;
 }
