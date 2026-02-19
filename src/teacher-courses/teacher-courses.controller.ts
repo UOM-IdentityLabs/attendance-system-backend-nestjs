@@ -36,6 +36,12 @@ export class TeacherCoursesController {
     return this.teacherCoursesService.getTeacherCourses(req);
   }
 
+  @Get('student/courses')
+  @UseGuards(JwtGuard)
+  getStudentCourses(@Req() req: any) {
+    return this.teacherCoursesService.getStudentCourses(req);
+  }
+
   @Get(':id')
   getById(@Param('id') id: string, @Query() query: GetTeacherCoursesDto) {
     return this.teacherCoursesService.getById(id, query);

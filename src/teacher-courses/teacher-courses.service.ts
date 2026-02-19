@@ -35,6 +35,10 @@ export class TeacherCoursesService
     return this.teacherCoursesRepo.getTeacherCourses(req);
   }
 
+  getStudentCourses(req: any): Promise<TeacherCourses[]> {
+    return this.teacherCoursesRepo.getStudentCourses(req);
+  }
+
   update(
     id: string,
     updateDto: UpdateTeacherCoursesDto,

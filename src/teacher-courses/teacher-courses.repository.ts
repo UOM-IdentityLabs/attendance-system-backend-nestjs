@@ -96,6 +96,17 @@ export class TeacherCoursesRepository
     return teacherCourses;
   }
 
+  async getStudentCourses(req: any): Promise<TeacherCourses[]> {
+    const studentCourses = await this.teacherCourse.find({
+      where: { course: { collegeYear: { id: req.user.collgeYearId } } },
+      relations: ['course', 'course.collegeYear'],
+    });
+
+    if (!studentCourses) throw new NotFoundException('No course(s) found');
+
+    return studentCourses;
+  }
+
   async update(
     id: string,
     updateDto: UpdateTeacherCoursesDto,
