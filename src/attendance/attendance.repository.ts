@@ -10,7 +10,7 @@ import { Attendance } from './entities/attendance.entity';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { GetAttendanceDto } from './dto/get-attendance.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult, In } from 'typeorm';
+import { Repository, DeleteResult, In, Between } from 'typeorm';
 import { Departments } from 'src/departments/entities/departments.entity';
 import { Students } from 'src/students/entities/students.entity';
 import { TeacherCourses } from 'src/teacher-courses/entities/teacher-courses.entity';
@@ -94,15 +94,54 @@ export class AttendanceRepository
   }
 
   async getAll(query: GetAttendanceDto, req) {
-    const { search, limit, offset, course } = query;
+    const { search, limit, offset, course, startDate, endDate } = query;
+
+    const whereCondition: any = {};
+    if (search) {
+      whereCondition.status = search;
+    }
+
+    if (course) {
+      whereCondition.teacherCourse = { id: course };
+    }
+
+    if (startDate && endDate) {
+      whereCondition.attendanceDate = Between(startDate, endDate);
+    }
+
     const [attendances, total] = await this.attendance.findAndCount({
-      where: [
-        {
-          status: search,
-          teacherCourse: { id: course },
-        },
-      ],
+      where: whereCondition,
       relations: ['student', 'student.person'],
+      take: limit ?? 100,
+      skip: offset ?? 0,
+    });
+
+    return { attendances, total };
+  }
+
+  async getMyAttendance(req, query: GetAttendanceDto) {
+    const { search, limit, offset, course, startDate, endDate } = query;
+
+    const whereCondition: any = {};
+    if (search) {
+      whereCondition.status = search;
+    }
+
+    if (course) {
+      whereCondition.teacherCourse = { id: course };
+    }
+
+    if (req.user.studentId) {
+      whereCondition.student = { id: req.user.studentId };
+    }
+
+    if (startDate && endDate) {
+      whereCondition.attendanceDate = Between(startDate, endDate);
+    }
+
+    const [attendances, total] = await this.attendance.findAndCount({
+      where: whereCondition,
+      relations: ['student', 'teacherCourse', 'teacherCourse.course'],
       take: limit ?? 100,
       skip: offset ?? 0,
     });
@@ -196,6 +235,7 @@ export class AttendanceRepository
       where: {
         attendanceDate: attendanceDate,
         student: { id: In(studentIds) },
+        teacherCourse: { id: teacherCourseId },
       },
     });
 

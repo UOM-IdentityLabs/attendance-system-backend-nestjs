@@ -12,4 +12,14 @@ export class GetAttendanceDto extends OffsetLimitDto {
   @IsString()
   @Type(() => String)
   course?: string;
+
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  startDate?: string;
+
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  endDate?: string;
 }

@@ -27,6 +27,10 @@ export class AttendanceService
     return this.attendanceRepo.getAll(query, req);
   }
 
+  getMyAttendance(req, query: GetAttendanceDto) {
+    return this.attendanceRepo.getMyAttendance(req, query);
+  }
+
   getById(id: string, query: GetAttendanceDto): Promise<Attendance> {
     return this.attendanceRepo.getById(id, query);
   }

@@ -31,6 +31,12 @@ export class AttendanceController {
     return this.attendanceService.getAll(query, req);
   }
 
+  @Get('me')
+  @UseGuards(JwtGuard)
+  getMyAttendance(@Req() req, @Query() query: GetAttendanceDto) {
+    return this.attendanceService.getMyAttendance(req, query);
+  }
+
   @Get(':id')
   getById(@Param('id') id: string, @Query() query: GetAttendanceDto) {
     return this.attendanceService.getById(id, query);
