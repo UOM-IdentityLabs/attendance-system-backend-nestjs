@@ -111,7 +111,7 @@ export class AttendanceRepository
 
     const [attendances, total] = await this.attendance.findAndCount({
       where: whereCondition,
-      relations: ['student', 'student.person'],
+      relations: ['student', 'student.person', 'student.group'],
       take: limit ?? 100,
       skip: offset ?? 0,
     });
