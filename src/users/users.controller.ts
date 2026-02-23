@@ -14,8 +14,18 @@ import { UsersService } from './users.service';
 import { CreateUsersDto } from './dto/create-users.dto';
 import { GetUsersDto } from './dto/get-users.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { UserRoleEnum } from './enums/user-role.enum';
 
 @Controller('users')
+@UseGuards(JwtGuard, RolesGuard)
+@Roles(
+  UserRoleEnum.SUPER,
+  UserRoleEnum.DEPARTMENT_HEAD,
+  UserRoleEnum.TEACHER,
+  UserRoleEnum.STUDENT,
+)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -30,7 +40,6 @@ export class UsersController {
   }
 
   @Get('me')
-  @UseGuards(JwtGuard)
   getMe(@Req() req: any) {
     return this.usersService.getMe(req.user);
   }

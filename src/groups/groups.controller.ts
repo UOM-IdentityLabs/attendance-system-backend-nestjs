@@ -7,13 +7,20 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupsDto } from './dto/create-groups.dto';
 import { GetGroupsDto } from './dto/get-groups.dto';
 import { UpdateGroupsDto } from './dto/update-groups.dto';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
 
 @Controller('groups')
+@UseGuards(JwtGuard, RolesGuard)
+@Roles(UserRoleEnum.SUPER, UserRoleEnum.DEPARTMENT_HEAD)
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 

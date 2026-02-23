@@ -7,12 +7,19 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PersonsService } from './persons.service';
 import { CreatePersonsDto } from './dto/create-persons.dto';
 import { GetPersonsDto } from './dto/get-persons.dto';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
 
 @Controller('persons')
+@UseGuards(JwtGuard, RolesGuard)
+@Roles(UserRoleEnum.SUPER)
 export class PersonsController {
   constructor(private readonly personsService: PersonsService) {}
 

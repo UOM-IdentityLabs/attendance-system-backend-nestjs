@@ -7,13 +7,20 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CollegeYearsService } from './college-years.service';
 import { CreateCollegeYearsDto } from './dto/create-college-years.dto';
 import { GetCollegeYearsDto } from './dto/get-college-years.dto';
 import { UpdateCollegeYearsDto } from './dto/update-college-years.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
+import { Roles } from 'src/auth/decorators/role.decorator';
 
 @Controller('college-years')
+@UseGuards(JwtGuard, RolesGuard)
+@Roles(UserRoleEnum.SUPER, UserRoleEnum.DEPARTMENT_HEAD)
 export class CollegeYearsController {
   constructor(private readonly collegeYearsService: CollegeYearsService) {}
 

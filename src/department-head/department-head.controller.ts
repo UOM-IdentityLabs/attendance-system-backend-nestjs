@@ -15,19 +15,22 @@ import { CreateDepartmentHeadDto } from './dto/create-department-head.dto';
 import { GetDepartmentHeadDto } from './dto/get-department-head.dto';
 import { UpdateDepartmentHeadDto } from './dto/update-department-head.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
+import { Roles } from 'src/auth/decorators/role.decorator';
 
 @Controller('department-head')
+@UseGuards(JwtGuard, RolesGuard)
+@Roles(UserRoleEnum.SUPER, UserRoleEnum.DEPARTMENT_HEAD)
 export class DepartmentHeadController {
   constructor(private readonly departmentHeadService: DepartmentHeadService) {}
 
   @Post()
-  @UseGuards(JwtGuard)
   create(@Body() createDto: CreateDepartmentHeadDto, @Req() req: any) {
     return this.departmentHeadService.create(createDto, req.user);
   }
 
   @Get()
-  @UseGuards(JwtGuard)
   getAll(@Query() query: GetDepartmentHeadDto, @Req() req: any) {
     return this.departmentHeadService.getAll(query, req.user);
   }

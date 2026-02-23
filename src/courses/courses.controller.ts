@@ -15,25 +15,27 @@ import { CreateCoursesDto } from './dto/create-courses.dto';
 import { GetCoursesDto } from './dto/get-courses.dto';
 import { UpdateCoursesDto } from './dto/update-courses.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
 
 @Controller('courses')
+@UseGuards(JwtGuard, RolesGuard)
+@Roles(UserRoleEnum.SUPER, UserRoleEnum.DEPARTMENT_HEAD)
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Post()
-  @UseGuards(JwtGuard)
   create(@Body() createDto: CreateCoursesDto, @Req() req: any) {
     return this.coursesService.create(createDto, req.user);
   }
 
   @Get('count')
-  @UseGuards(JwtGuard)
   getCountAllCourses() {
     return this.coursesService.getCountAllCourses();
   }
 
   @Get()
-  @UseGuards(JwtGuard)
   getAll(@Query() query: GetCoursesDto, @Req() req: any) {
     return this.coursesService.getAll(query, req.user);
   }

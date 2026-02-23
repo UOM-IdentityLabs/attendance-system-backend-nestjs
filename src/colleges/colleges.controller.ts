@@ -7,13 +7,20 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CollegesService } from './colleges.service';
 import { CreateCollegesDto } from './dto/create-colleges.dto';
 import { GetCollegesDto } from './dto/get-colleges.dto';
 import { UpdateCollegesDto } from './dto/update-colleges.dto';
+import { UserRoleEnum } from 'src/users/enums/user-role.enum';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
 @Controller('colleges')
+@UseGuards(JwtGuard, RolesGuard)
+@Roles(UserRoleEnum.SUPER)
 export class CollegesController {
   constructor(private readonly collegeService: CollegesService) {}
 
